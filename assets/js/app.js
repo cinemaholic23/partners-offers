@@ -340,42 +340,37 @@ function getCarouselSnapPoints() {
   return cards.map((card) => Math.min(card.offsetLeft - leftInset, maxScroll));
 }
 
-function snapOffersCarousel() {
+function clampCarouselIndex(index) {
+  const snapPoints = getCarouselSnapPoints();
+  return Math.max(0, Math.min(snapPoints.length - 1, index));
+}
+
+function goToCarouselCard(index) {
   const snapPoints = getCarouselSnapPoints();
 
   if (!snapPoints.length) {
     return;
   }
 
-  const current = offersViewport.scrollLeft;
-  const delta = current - carouselGestureStartScroll;
-  const currentIndex = snapPoints.reduce((closestIndex, point, index) => {
-    return Math.abs(point - carouselGestureStartScroll) < Math.abs(snapPoints[closestIndex] - carouselGestureStartScroll)
-      ? index
-      : closestIndex;
-  }, 0);
-  const threshold = 24;
-  let targetIndex = currentIndex;
-
-  if (Math.abs(delta) >= threshold) {
-    targetIndex = currentIndex + Math.sign(delta);
-  }
-
-  targetIndex = Math.max(0, Math.min(snapPoints.length - 1, targetIndex));
-
+  const targetIndex = clampCarouselIndex(index);
   const target = snapPoints[targetIndex];
 
-  if (Math.abs(target - current) < 1) {
+  if (Math.abs(target - offersViewport.scrollLeft) < 1) {
     return;
   }
 
-  animateCarouselScroll(current, target);
+  carouselCurrentIndex = targetIndex;
+  animateCarouselScroll(offersViewport.scrollLeft, target);
 }
 
-let carouselSnapTimer;
 let carouselAnimationFrame;
 let isCarouselAnimating = false;
-let carouselGestureStartScroll = 0;
+let carouselCurrentIndex = 0;
+let carouselWheelLocked = false;
+let carouselWheelUnlockTimer;
+let carouselPointerStartX = 0;
+let carouselPointerStartY = 0;
+let carouselPointerActive = false;
 
 function easeOutCubic(progress) {
   return 1 - Math.pow(1 - progress, 3);
@@ -415,24 +410,61 @@ function animateCarouselScroll(from, to) {
   carouselAnimationFrame = window.requestAnimationFrame(tick);
 }
 
-["pointerdown", "touchstart", "wheel"].forEach((eventName) => {
-  offersViewport.addEventListener(eventName, () => {
-    stopCarouselAnimation();
-    carouselGestureStartScroll = offersViewport.scrollLeft;
-  }, { passive: true });
-});
+offersViewport.addEventListener("wheel", (event) => {
+  const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
 
-offersViewport.addEventListener("scroll", () => {
-  if (isCarouselAnimating) {
+  if (Math.abs(dominantDelta) < 2) {
     return;
   }
 
-  window.clearTimeout(carouselSnapTimer);
-  carouselSnapTimer = window.setTimeout(snapOffersCarousel, 260);
+  event.preventDefault();
+
+  window.clearTimeout(carouselWheelUnlockTimer);
+  carouselWheelUnlockTimer = window.setTimeout(() => {
+    carouselWheelLocked = false;
+  }, 220);
+
+  if (carouselWheelLocked || isCarouselAnimating) {
+    return;
+  }
+
+  carouselWheelLocked = true;
+  goToCarouselCard(carouselCurrentIndex + Math.sign(dominantDelta));
+}, { passive: false });
+
+offersViewport.addEventListener("pointerdown", (event) => {
+  stopCarouselAnimation();
+  carouselPointerActive = true;
+  carouselPointerStartX = event.clientX;
+  carouselPointerStartY = event.clientY;
+  offersViewport.setPointerCapture(event.pointerId);
+});
+
+offersViewport.addEventListener("pointerup", (event) => {
+  if (!carouselPointerActive) {
+    return;
+  }
+
+  carouselPointerActive = false;
+
+  const deltaX = event.clientX - carouselPointerStartX;
+  const deltaY = event.clientY - carouselPointerStartY;
+  const threshold = 24;
+
+  if (Math.abs(deltaX) < threshold || Math.abs(deltaX) < Math.abs(deltaY)) {
+    goToCarouselCard(carouselCurrentIndex);
+    return;
+  }
+
+  goToCarouselCard(carouselCurrentIndex + (deltaX < 0 ? 1 : -1));
+});
+
+offersViewport.addEventListener("pointercancel", () => {
+  carouselPointerActive = false;
+  goToCarouselCard(carouselCurrentIndex);
 });
 
 window.addEventListener("resize", () => {
   stopCarouselAnimation();
-  window.clearTimeout(carouselSnapTimer);
-  carouselSnapTimer = window.setTimeout(snapOffersCarousel, 180);
+  goToCarouselCard(carouselCurrentIndex);
 });
