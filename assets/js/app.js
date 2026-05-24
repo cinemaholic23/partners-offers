@@ -25,7 +25,7 @@ const partnerCards = [
     ]
   },
   {
-    title: "Кэшбэк до 40% на\u00a0товары в Lamoda",
+    title: "Кэшбэк до\u00a040% на\u00a0товары в\u00a0Lamoda",
     background: "#E4F0FF",
     image: {
       src: "assets/images/lamoda.png",
@@ -348,20 +348,34 @@ function snapOffersCarousel() {
   }
 
   const current = offersViewport.scrollLeft;
-  const nearest = snapPoints.reduce((closest, point) => {
-    return Math.abs(point - current) < Math.abs(closest - current) ? point : closest;
-  }, snapPoints[0]);
+  const delta = current - carouselGestureStartScroll;
+  const currentIndex = snapPoints.reduce((closestIndex, point, index) => {
+    return Math.abs(point - carouselGestureStartScroll) < Math.abs(snapPoints[closestIndex] - carouselGestureStartScroll)
+      ? index
+      : closestIndex;
+  }, 0);
+  const threshold = 24;
+  let targetIndex = currentIndex;
 
-  if (Math.abs(nearest - current) < 1) {
+  if (Math.abs(delta) >= threshold) {
+    targetIndex = currentIndex + Math.sign(delta);
+  }
+
+  targetIndex = Math.max(0, Math.min(snapPoints.length - 1, targetIndex));
+
+  const target = snapPoints[targetIndex];
+
+  if (Math.abs(target - current) < 1) {
     return;
   }
 
-  animateCarouselScroll(current, nearest);
+  animateCarouselScroll(current, target);
 }
 
 let carouselSnapTimer;
 let carouselAnimationFrame;
 let isCarouselAnimating = false;
+let carouselGestureStartScroll = 0;
 
 function easeOutCubic(progress) {
   return 1 - Math.pow(1 - progress, 3);
@@ -402,7 +416,10 @@ function animateCarouselScroll(from, to) {
 }
 
 ["pointerdown", "touchstart", "wheel"].forEach((eventName) => {
-  offersViewport.addEventListener(eventName, stopCarouselAnimation, { passive: true });
+  offersViewport.addEventListener(eventName, () => {
+    stopCarouselAnimation();
+    carouselGestureStartScroll = offersViewport.scrollLeft;
+  }, { passive: true });
 });
 
 offersViewport.addEventListener("scroll", () => {
