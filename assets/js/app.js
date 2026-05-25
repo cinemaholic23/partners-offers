@@ -334,10 +334,11 @@ startFomoTimers();
 
 function getCarouselSnapPoints() {
   const cards = [...offersCarousel.querySelectorAll(".partner-card")];
-  const leftInset = 16;
+  const firstCard = cards[0];
+  const leftInset = firstCard ? parseFloat(window.getComputedStyle(firstCard).marginLeft) || 0 : 0;
   const maxScroll = offersViewport.scrollWidth - offersViewport.clientWidth;
 
-  return cards.map((card) => Math.min(card.offsetLeft - leftInset, maxScroll));
+  return cards.map((card) => Math.min(Math.max(0, card.offsetLeft - offersCarousel.offsetLeft - leftInset), maxScroll));
 }
 
 function clampCarouselIndex(index) {

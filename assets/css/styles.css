@@ -32,6 +32,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
 }
 
+.page {
+  background: var(--color-background-primary);
+}
+
 .header {
   padding: 24px var(--page-x) 12px;
 }
@@ -85,6 +89,10 @@ h1 {
   justify-content: center;
 }
 
+.search-button span {
+  display: none;
+}
+
 .icon {
   width: 24px;
   height: 24px;
@@ -93,7 +101,19 @@ h1 {
 }
 
 .offers-section {
+  --offers-card-width: calc(100vw - (var(--page-x) * 2) - var(--search-size) - var(--control-gap));
+
   margin-top: 16px;
+}
+
+.offers-section__title {
+  display: none;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--h3-size);
+  line-height: var(--h3-line);
+  font-weight: var(--h3-weight-600);
+  letter-spacing: 0;
 }
 
 .offers-viewport {
@@ -118,8 +138,8 @@ h1 {
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  flex: 0 0 calc(100vw - (var(--page-x) * 2) - var(--search-size) - var(--control-gap));
-  width: calc(100vw - (var(--page-x) * 2) - var(--search-size) - var(--control-gap));
+  flex: 0 0 var(--offers-card-width);
+  width: var(--offers-card-width);
   align-self: stretch;
   height: 160px;
   padding: 12px 16px 16px;
@@ -418,4 +438,107 @@ h1 {
   height: 320px;
   border-radius: 16px;
   background: var(--color-background-secondary);
+}
+
+@media (min-width: 768px) {
+  body {
+    --page-x: 0px;
+
+    min-height: 100vh;
+    padding: 32px;
+    background: var(--color-background-secondary);
+  }
+
+  .page {
+    width: 696px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 32px;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+
+  .header {
+    padding-top: 0;
+    padding-bottom: 32px;
+  }
+
+  h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .city-row {
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .city-select {
+    height: 64px;
+  }
+
+  .search-button {
+    width: auto;
+    height: 64px;
+    padding: 12px;
+    gap: 6px;
+    flex: 1 0 0;
+    justify-content: flex-start;
+  }
+
+  .search-button span {
+    display: block;
+    color: var(--color-text-primary);
+    font-size: var(--text-m-size);
+    line-height: var(--text-m-line);
+    font-weight: var(--text-m-weight-400);
+  }
+
+  .offers-section {
+    --offers-card-width: calc((696px - 64px - 16px) / 2);
+
+    margin-top: 32px;
+  }
+
+  .offers-carousel {
+    gap: 16px;
+  }
+
+  .offers-section__title {
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .offers-section__title,
+  .cashback-categories__title,
+  .popular-section__title {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .partner-card:first-child {
+    margin-left: 0;
+  }
+
+  .partner-card:last-child {
+    margin-right: 0;
+  }
+
+  .cashback-categories {
+    margin-top: 32px;
+  }
+
+  .cashback-categories__carousel {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .popular-section {
+    margin-top: 16px;
+  }
+
+  .popular-placeholder-wrap {
+    padding-right: 0;
+    padding-left: 0;
+  }
 }
