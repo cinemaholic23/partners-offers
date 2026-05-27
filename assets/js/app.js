@@ -1,5 +1,19 @@
 const partnerCards = [
   {
+    title: "Кэшбэк до\u00a040% на\u00a0товары в\u00a0Lamoda",
+    background: "#E4F0FF",
+    href: "offer-detail.html",
+    image: {
+      src: "assets/images/lamoda.png",
+      alt: ""
+    },
+    timer: {
+      id: "lamoda",
+      label: "До конца акции",
+      remainingSeconds: 1805
+    }
+  },
+  {
     title: "Успей купить",
     background: "#FFCBB3",
     image: {
@@ -9,6 +23,20 @@ const partnerCards = [
     timer: {
       label: "До конца акции",
       remainingSeconds: 3610
+    }
+  },
+  {
+    title: "Альфа-Пятница",
+    background: "#EF272E",
+    textTone: "inverse",
+    image: {
+      src: "assets/images/alfa-friday.avif",
+      alt: ""
+    },
+    timer: {
+      state: "upcoming",
+      label: "Старт акции",
+      startsAt: "29 мая, 00:00"
     }
   },
   {
@@ -23,19 +51,6 @@ const partnerCards = [
       { label: "Rappoport", image: "assets/images/rappoport.png" },
       { label: "+11", kind: "more" }
     ]
-  },
-  {
-    title: "Кэшбэк до\u00a040% на\u00a0товары в\u00a0Lamoda",
-    background: "#E4F0FF",
-    image: {
-      src: "assets/images/lamoda.png",
-      alt: ""
-    },
-    timer: {
-      variant: "inline",
-      label: "До конца акции",
-      remainingSeconds: 3610
-    }
   },
   {
     title: "Промокоды",
@@ -56,6 +71,14 @@ const cashbackCategories = [
   { title: "Продукты", image: "assets/images/categories/products.png" },
   { title: "Кафе и\u00a0рестораны", image: "assets/images/categories/cafe.png" }
 ];
+
+const detailOfferTimer = {
+  id: "lamoda",
+  label: "До конца акции",
+  remainingSeconds: 1805
+};
+
+const timerStoragePrefix = "partners-offers:timer:";
 
 function createElement(tagName, className, text) {
   const element = document.createElement(tagName);
@@ -136,11 +159,6 @@ function createPartnerMeta(card) {
 function createTimerMeta(timerConfig) {
   const meta = createElement("div", "partner-card__meta");
 
-  if (timerConfig.variant === "inline") {
-    meta.append(createInlineTimer(timerConfig));
-    return meta;
-  }
-
   meta.append(createSegmentedTimer(timerConfig));
   return meta;
 }
@@ -149,30 +167,51 @@ function createSegmentedTimer(timerConfig) {
   const timer = createElement("div", "fomo-timer");
   const segments = createElement("div", "fomo-timer__segments");
 
-  timer.dataset.timerType = "segmented";
-  timer.dataset.remainingSeconds = timerConfig.remainingSeconds;
   timer.append(createElement("div", "fomo-timer__label", timerConfig.label));
 
-  renderTimerSegments(segments, timerConfig.remainingSeconds);
+  if (timerConfig.state === "upcoming") {
+    timer.dataset.timerState = "upcoming";
+    timer.append(createElement("div", "fomo-timer__badge", timerConfig.startsAt));
+    return timer;
+  }
+
+  timer.dataset.timerState = "active";
+  timer.dataset.timerEndsAt = getTimerEndsAt(timerConfig);
+
+  if (timerConfig.id) {
+    timer.dataset.timerId = timerConfig.id;
+  }
+
+  timer.dataset.remainingSeconds = getTimerRemainingSeconds(Number(timer.dataset.timerEndsAt));
+
+  renderTimerSegments(segments, Number(timer.dataset.remainingSeconds));
   timer.append(segments);
   return timer;
 }
 
-function createInlineTimer(timerConfig) {
-  const timer = createElement("div", "fomo-timer-inline");
-  const value = createElement("div", "fomo-timer-inline__value");
+function getTimerStorageKey(timerId) {
+  return `${timerStoragePrefix}${timerId}`;
+}
 
-  timer.dataset.timerType = "inline";
-  timer.dataset.remainingSeconds = timerConfig.remainingSeconds;
+function getTimerEndsAt(timerConfig) {
+  if (!timerConfig.id) {
+    return Date.now() + timerConfig.remainingSeconds * 1000;
+  }
 
-  timer.append(createElement("div", "fomo-timer__label", timerConfig.label));
-  value.append(createElement("span", "fomo-timer-inline__dot"));
-  value.append(createElement("span", "fomo-timer-inline__main"));
-  value.append(createElement("span", "fomo-timer-inline__seconds"));
-  timer.append(value);
+  const key = getTimerStorageKey(timerConfig.id);
+  const storedEndsAt = Number(window.localStorage.getItem(key));
 
-  renderInlineTimer(timer, timerConfig.remainingSeconds);
-  return timer;
+  if (storedEndsAt && storedEndsAt > Date.now()) {
+    return storedEndsAt;
+  }
+
+  const endsAt = Date.now() + timerConfig.remainingSeconds * 1000;
+  window.localStorage.setItem(key, String(endsAt));
+  return endsAt;
+}
+
+function getTimerRemainingSeconds(endsAt) {
+  return Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
 }
 
 function getTimerSegments(totalSeconds) {
@@ -233,63 +272,66 @@ function renderTimerSegments(container, totalSeconds, previousSegments = {}) {
   });
 }
 
-function updateFomoTimer(timer) {
+function updateFomoTimer(timer, syncedRemainingSeconds) {
+  const next = typeof syncedRemainingSeconds === "number"
+    ? syncedRemainingSeconds
+    : getTimerRemainingSeconds(Number(timer.dataset.timerEndsAt));
   const current = Number(timer.dataset.remainingSeconds || 0);
-  const next = Math.max(0, current - 1);
 
-  timer.dataset.remainingSeconds = next;
-
-  if (timer.dataset.timerType === "inline") {
-    renderInlineTimer(timer, next);
-    pulseInlineTimerDot(timer);
+  if (next === current) {
     return;
   }
+
+  timer.dataset.remainingSeconds = next;
 
   const previousSegments = getCurrentTimerSegments(timer);
   renderTimerSegments(timer.querySelector(".fomo-timer__segments"), next, previousSegments);
 }
 
-function getInlineTimerParts(totalSeconds) {
-  const safeSeconds = Math.max(0, totalSeconds);
-  const hours = Math.floor(safeSeconds / 3600);
-  const minutes = Math.floor((safeSeconds % 3600) / 60);
-  const seconds = safeSeconds % 60;
+function syncFomoTimers() {
+  const activeTimers = [...document.querySelectorAll('.fomo-timer[data-timer-state="active"]')];
+  const remainingByTimerKey = new Map();
 
-  return {
-    main: `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`,
-    seconds: String(seconds).padStart(2, "0")
-  };
-}
+  activeTimers.forEach((timer) => {
+    const key = timer.dataset.timerId || timer.dataset.timerEndsAt;
 
-function renderInlineTimer(timer, totalSeconds) {
-  const parts = getInlineTimerParts(totalSeconds);
-  timer.querySelector(".fomo-timer-inline__main").textContent = parts.main;
-  timer.querySelector(".fomo-timer-inline__seconds").textContent = parts.seconds;
-}
+    if (!remainingByTimerKey.has(key)) {
+      remainingByTimerKey.set(key, getTimerRemainingSeconds(Number(timer.dataset.timerEndsAt)));
+    }
 
-function pulseInlineTimerDot(timer) {
-  const dot = timer.querySelector(".fomo-timer-inline__dot");
-
-  if (!dot) {
-    return;
-  }
-
-  dot.classList.remove("fomo-timer-inline__dot--pulse");
-  void dot.offsetWidth;
-  dot.classList.add("fomo-timer-inline__dot--pulse");
+    updateFomoTimer(timer, remainingByTimerKey.get(key));
+  });
 }
 
 function startFomoTimers() {
+  syncFomoTimers();
+
   window.setInterval(() => {
-    document.querySelectorAll(".fomo-timer, .fomo-timer-inline").forEach(updateFomoTimer);
+    syncFomoTimers();
   }, 1000);
 }
 
 function PartnerCard(card) {
-  const article = createElement("article", "partner-card");
+  const article = createElement(card.href ? "a" : "article", "partner-card");
   article.style.background = card.background || "var(--surface-muted)";
 
+  if (card.href) {
+    article.href = card.href;
+  }
+
+  if (card.textTone === "inverse") {
+    article.classList.add("partner-card--text-inverse");
+  }
+
+  if (card.timer?.state === "upcoming") {
+    article.classList.add("partner-card--has-indicator");
+  }
+
   article.append(createElement("h2", "partner-card__title", card.title));
+
+  if (card.timer?.state === "upcoming") {
+    article.append(createElement("span", "partner-card__indicator", "Скоро"));
+  }
 
   const meta = createPartnerMeta(card);
   if (meta) {
@@ -321,14 +363,25 @@ function CashbackCategory(category) {
 const offersCarousel = document.querySelector("#offersCarousel");
 const offersViewport = document.querySelector(".offers-viewport");
 const cashbackCategoriesCarousel = document.querySelector("#cashbackCategories");
+const offerFooterTimer = document.querySelector("#offerFooterTimer");
 
-partnerCards.forEach((card) => {
-  offersCarousel.append(PartnerCard(card));
-});
+if (offersCarousel) {
+  partnerCards.forEach((card) => {
+    offersCarousel.append(PartnerCard(card));
+  });
+}
 
-cashbackCategories.forEach((category) => {
-  cashbackCategoriesCarousel.append(CashbackCategory(category));
-});
+if (cashbackCategoriesCarousel) {
+  cashbackCategories.forEach((category) => {
+    cashbackCategoriesCarousel.append(CashbackCategory(category));
+  });
+}
+
+if (offerFooterTimer) {
+  const timer = createSegmentedTimer(detailOfferTimer);
+  timer.classList.add("fomo-timer--footer");
+  offerFooterTimer.append(timer);
+}
 
 startFomoTimers();
 
@@ -411,6 +464,7 @@ function animateCarouselScroll(from, to) {
   carouselAnimationFrame = window.requestAnimationFrame(tick);
 }
 
+if (offersViewport && offersCarousel) {
 offersViewport.addEventListener("wheel", (event) => {
   const dominantDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
 
@@ -469,3 +523,4 @@ window.addEventListener("resize", () => {
   stopCarouselAnimation();
   goToCarouselCard(carouselCurrentIndex);
 });
+}

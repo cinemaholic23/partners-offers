@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Деталка оффера</title>
+    <link rel="stylesheet" href="assets/css/styles.css?v=25">
+  </head>
+  <body>
+    <main class="offer-detail-page">
+      <nav class="offer-navbar" aria-label="Навигация оффера">
+        <button class="offer-navbar__back" type="button" aria-label="Назад">
+          <span class="offer-navbar__back-icon" aria-hidden="true"></span>
+        </button>
+      </nav>
+
+      <header class="offer-detail-header">
+        <h1>Кэшбэк до 40%</h1>
+        <p>На все покупки 28 Мая с 12:00 до&nbsp;15:00</p>
+      </header>
+
+      <section class="offer-detail-card" aria-label="Lamoda">
+        <div class="offer-detail-card__media" aria-hidden="true"></div>
+        <footer class="offer-detail-card__footer">
+          <div class="pure-cell">
+            <span class="partner-logo pure-cell__logo" style="background-image: url('assets/images/lamoda-logo.png');" aria-label="Lamoda"></span>
+            <div class="pure-cell__content">
+              <p class="pure-cell__label">Lamoda</p>
+              <p class="pure-cell__subline">Одежда и обувь</p>
+            </div>
+          </div>
+        </footer>
+      </section>
+
+      <section class="offer-how-to" aria-labelledby="offerHowToTitle">
+        <h2 id="offerHowToTitle">Как это работает</h2>
+        <ol class="offer-stepper">
+          <li class="offer-stepper__item">
+            <span class="offer-stepper__marker">1</span>
+            <p>Перейдите в&nbsp;Lamoda из&nbsp;предложения партнёра</p>
+          </li>
+          <li class="offer-stepper__item">
+            <span class="offer-stepper__marker">2</span>
+            <p>Выберите товары и оформите заказ в&nbsp;период акции</p>
+          </li>
+          <li class="offer-stepper__item">
+            <span class="offer-stepper__marker">3</span>
+            <p>Оплатите покупку картой Альфа&#8209;Банка</p>
+          </li>
+          <li class="offer-stepper__item">
+            <span class="offer-stepper__marker">4</span>
+            <p>Кэшбэк начислится после подтверждения покупки</p>
+          </li>
+        </ol>
+      </section>
+
+      <footer class="offer-action-footer">
+        <div class="offer-action-footer__timer" id="offerFooterTimer"></div>
+        <a class="offer-action-footer__button" href="https://www.lamoda.ru/" aria-label="Перейти за покупками">За покупками</a>
+      </footer>
+    </main>
+    <script>
+      document.querySelector(".offer-navbar__back").addEventListener("click", () => {
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+
+        window.location.href = "index.html";
+      });
+    </script>
+    <script src="assets/js/app.js?v=29"></script>
+  </body>
+</html>

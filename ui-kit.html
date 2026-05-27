@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UI Kit</title>
+    <link rel="stylesheet" href="assets/css/styles.css?v=24">
+  </head>
+  <body>
+    <main class="ui-kit-page">
+      <header class="ui-kit-header">
+        <p class="ui-kit-kicker">Partners offers</p>
+        <h1>UI Kit</h1>
+      </header>
+
+      <section class="ui-kit-section" aria-labelledby="colorsTitle">
+        <h2 id="colorsTitle" class="ui-kit-section__title">Цвета</h2>
+        <div class="ui-kit-grid ui-kit-grid--colors">
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch" style="background: var(--color-text-primary);"></span>
+            <div>
+              <h3>Text primary</h3>
+              <p>#202124</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch" style="background: var(--color-text-secondary);"></span>
+            <div>
+              <h3>Text secondary</h3>
+              <p>rgba(0, 0, 0, 0.64)</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch ui-kit-color__swatch--dark" style="background: var(--color-text-inverse);"></span>
+            <div>
+              <h3>Text inverse</h3>
+              <p>rgba(255, 255, 255, 0.94)</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch ui-kit-color__swatch--bordered" style="background: var(--color-background-primary);"></span>
+            <div>
+              <h3>Background primary</h3>
+              <p>#FFFFFF</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch" style="background: var(--color-background-secondary);"></span>
+            <div>
+              <h3>Background secondary</h3>
+              <p>rgba(169, 172, 180, 0.12)</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch" style="background: var(--color-background-accent);"></span>
+            <div>
+              <h3>Background accent</h3>
+              <p>#212124</p>
+            </div>
+          </article>
+          <article class="ui-kit-color">
+            <span class="ui-kit-color__swatch" style="background: var(--color-accent-red);"></span>
+            <div>
+              <h3>Accent red</h3>
+              <p>rgba(246, 61, 0, 1)</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="ui-kit-section" aria-labelledby="typeTitle">
+        <h2 id="typeTitle" class="ui-kit-section__title">Типографика</h2>
+        <div class="ui-kit-type-list">
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">h1 600 · 24/28 · desktop 32/40</p>
+            <h1 class="ui-kit-type-row__h1">Предложения партнёров</h1>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">h2 desktop · 24/32/600</p>
+            <h2 class="ui-kit-type-row__h2">Лучшие подборки</h2>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">h3 600 · 20/24/600</p>
+            <h3 class="ui-kit-type-row__h3-600">Категории кэшбэка</h3>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">h3 500 · 20/24/500</p>
+            <h3 class="ui-kit-type-row__h3-500">Кэшбэк до 40% на товары</h3>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">text l 400 · 16/20/400</p>
+            <p class="ui-kit-type-row__text-l-400">На все покупки 28 Мая с 12:00 до 15:00</p>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">text l 500 · 16/20/500</p>
+            <p class="ui-kit-type-row__text-l-500">За покупками</p>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">text m 500 · 14/20/500</p>
+            <p class="ui-kit-type-row__text-m-500">01:00:10</p>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">text m 400 · 14/20/400</p>
+            <p class="ui-kit-type-row__text-m-400">г. Москва</p>
+          </article>
+          <article class="ui-kit-type-row">
+            <p class="ui-kit-type-row__meta">text s 500 · 12/16/500</p>
+            <p class="ui-kit-type-row__text-s-500">59</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="ui-kit-section" aria-labelledby="componentsTitle">
+        <h2 id="componentsTitle" class="ui-kit-section__title">Компоненты</h2>
+        <div class="ui-kit-components">
+          <div class="ui-kit-component">
+            <h3 class="ui-kit-component__title">Controls</h3>
+            <div class="ui-kit-control-row">
+              <div class="city-select" aria-label="Выбранный город">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M5.572 8.782c0-3.55 2.878-6.429 6.429-6.429s6.428 2.878 6.428 6.429c0 2.169-1.147 4.124-2.568 5.704-1.413 1.571-3.025 2.69-3.787 3.176a.136.136 0 0 1-.147 0c-.762-.486-2.373-1.605-3.786-3.176-1.422-1.58-2.569-3.535-2.569-5.704ZM12.001 6.163a2.619 2.619 0 1 0 0 5.238 2.619 2.619 0 0 0 0-5.238Z" fill="currentColor"/>
+                  <path d="M5.333 19.258c0-.908 1.424-1.698 3.519-2.099.944.803 1.801 1.386 2.306 1.708.515.328 1.168.328 1.684 0 .505-.322 1.361-.905 2.305-1.708 2.095.401 3.519 1.191 3.519 2.099 0 1.315-2.984 2.381-6.666 2.381-3.682 0-6.667-1.066-6.667-2.381Z" fill="currentColor"/>
+                </svg>
+                <span>г. Москва</span>
+              </div>
+              <button class="search-button ui-kit-search-button" type="button" aria-label="Поиск">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M11.103 2.141a8.796 8.796 0 0 1 6.808 14.367l3.458 3.458a1.108 1.108 0 0 1-1.567 1.567l-3.5-3.498a8.755 8.755 0 0 1-5.199 1.699 8.796 8.796 0 0 1 0-17.593Zm0 2.217a6.58 6.58 0 1 0 0 13.159 6.58 6.58 0 0 0 6.58-6.58 6.58 6.58 0 0 0-6.58-6.579Z" fill="currentColor"/>
+                </svg>
+                <span>Поиск</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="ui-kit-component">
+            <h3 class="ui-kit-component__title">Partner logos</h3>
+            <div class="partner-logos">
+              <span class="partner-logo" style="background-image: url('assets/images/wrf.png');" aria-label="WRF"></span>
+              <span class="partner-logo" style="background-image: url('assets/images/rappoport.png');" aria-label="Rappoport"></span>
+              <span class="partner-logo partner-logo--more">+11</span>
+            </div>
+          </div>
+
+          <div class="ui-kit-component">
+            <h3 class="ui-kit-component__title">Timers</h3>
+            <div class="ui-kit-timer-stack">
+              <div class="fomo-timer">
+                <div class="fomo-timer__label">До конца акции</div>
+                <div class="fomo-timer__segments">
+                  <span class="fomo-timer__segment">01</span>
+                  <span class="fomo-timer__separator">:</span>
+                  <span class="fomo-timer__segment">00</span>
+                  <span class="fomo-timer__separator">:</span>
+                  <span class="fomo-timer__segment">10</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui-kit-component">
+            <h3 class="ui-kit-component__title">Offer card</h3>
+            <article class="partner-card ui-kit-offer-card" style="background: #E4F0FF;">
+              <h2 class="partner-card__title">Кэшбэк до&nbsp;40% на&nbsp;товары</h2>
+              <div class="partner-card__meta">
+                <div class="fomo-timer">
+                  <div class="fomo-timer__label">До конца акции</div>
+                  <div class="fomo-timer__segments">
+                    <span class="fomo-timer__segment">01</span>
+                    <span class="fomo-timer__separator">:</span>
+                    <span class="fomo-timer__segment">00</span>
+                    <span class="fomo-timer__separator">:</span>
+                    <span class="fomo-timer__segment">10</span>
+                  </div>
+                </div>
+              </div>
+              <img class="partner-card__image" src="assets/images/lamoda.png" alt="">
+            </article>
+          </div>
+
+          <div class="ui-kit-component">
+            <h3 class="ui-kit-component__title">Cashback category</h3>
+            <article class="cashback-category">
+              <div class="cashback-category__image" style="background-image: url('assets/images/categories/products.png');"></div>
+              <h3 class="cashback-category__title">Продукты</h3>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
