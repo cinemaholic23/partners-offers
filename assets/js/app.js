@@ -9,7 +9,7 @@ const partnerCards = [
     },
     timer: {
       id: "lamoda",
-      label: "До конца акции",
+      label: "Осталось",
       remainingSeconds: 1805
     }
   },
@@ -21,7 +21,7 @@ const partnerCards = [
       alt: ""
     },
     timer: {
-      label: "До конца акции",
+      label: "Осталось",
       remainingSeconds: 3610
     }
   },
@@ -35,8 +35,8 @@ const partnerCards = [
     },
     timer: {
       state: "upcoming",
-      label: "Старт акции",
-      startsAt: "29 мая, 00:00"
+      label: "Начнётся",
+      startsAt: "29 мая, 12:30"
     }
   },
   {
@@ -74,7 +74,7 @@ const cashbackCategories = [
 
 const detailOfferTimer = {
   id: "lamoda",
-  label: "До конца акции",
+  label: "Осталось",
   remainingSeconds: 1805
 };
 

@@ -18,7 +18,7 @@ body {
   --text-m-weight-400: 400;
   --text-m-weight-500: 500;
   --text-l-size: 16px;
-  --text-l-line: 20px;
+  --text-l-line: 24px;
   --text-l-weight-400: 400;
   --text-l-weight-500: 500;
   --text-s-size: 12px;
@@ -198,8 +198,13 @@ h1 {
 }
 
 .partner-card--text-inverse .partner-card__title,
-.partner-card--text-inverse .fomo-timer__label {
+.partner-card--text-inverse .fomo-timer__label,
+.partner-card--text-inverse .fomo-timer__badge {
   color: var(--color-text-inverse);
+}
+
+.partner-card--text-inverse.partner-card--has-indicator .fomo-timer {
+  gap: 0;
 }
 
 .partner-card__image {
@@ -253,7 +258,7 @@ h1 {
 }
 
 .fomo-timer__label {
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   font-size: var(--text-m-size);
   line-height: var(--text-m-line);
   font-weight: var(--text-m-weight-400);
@@ -266,32 +271,25 @@ h1 {
 }
 
 .fomo-timer__badge {
-  display: inline-flex;
-  width: max-content;
-  min-height: 28px;
-  padding: 4px 6px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: var(--color-background-primary);
+  display: block;
   color: var(--color-text-primary);
-  font-size: var(--text-m-size);
-  line-height: var(--text-m-line);
-  font-weight: var(--text-m-weight-500);
+  font-size: var(--text-l-size);
+  line-height: var(--text-l-line);
+  font-weight: var(--text-l-weight-500);
 }
 
 .fomo-timer__separator {
   color: rgba(0, 0, 0, 0.40);
-  font-size: var(--text-m-size);
-  line-height: var(--text-m-line);
-  font-weight: var(--text-m-weight-500);
+  font-size: var(--text-l-size);
+  line-height: var(--text-l-line);
+  font-weight: var(--text-l-weight-500);
 }
 
 .fomo-timer__segment {
   position: relative;
   display: flex;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   align-items: center;
   justify-content: center;
   gap: 1px;
@@ -299,15 +297,15 @@ h1 {
   border-radius: 8px;
   background: var(--color-background-primary);
   color: var(--color-text-primary);
-  font-size: var(--text-m-size);
-  line-height: var(--text-m-line);
-  font-weight: var(--text-m-weight-500);
+  font-size: var(--text-l-size);
+  line-height: var(--text-l-line);
+  font-weight: var(--text-l-weight-500);
 }
 
 .fomo-timer__digit-slot {
   position: relative;
-  width: 8px;
-  height: 28px;
+  width: 9px;
+  height: 32px;
 }
 
 .fomo-timer__digit {
@@ -735,7 +733,10 @@ h1 {
 }
 
 .offer-action-footer__timer {
+  display: flex;
   flex: 0 0 auto;
+  min-height: 56px;
+  align-items: center;
 }
 
 .fomo-timer--footer .fomo-timer__segment {
