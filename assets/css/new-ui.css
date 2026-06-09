@@ -154,19 +154,94 @@ h1 {
   z-index: 1;
 }
 
-.hero-story__blur,
+.hero-story__gradient-blur,
 .hero-story__shade {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.hero-story__blur {
+.hero-story__gradient-blur {
+  top: -56px;
   z-index: 0;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 100%);
+}
+
+.hero-story__gradient-blur > span {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.01);
+  -webkit-backdrop-filter: blur(var(--blur));
+  backdrop-filter: blur(var(--blur));
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent var(--start),
+    black var(--solid-start),
+    black var(--solid-end),
+    transparent var(--end)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent var(--start),
+    black var(--solid-start),
+    black var(--solid-end),
+    transparent var(--end)
+  );
+}
+
+.hero-story__gradient-blur > span:nth-child(1) {
+  --blur: 0px;
+  --start: 0%;
+  --solid-start: 12%;
+  --solid-end: 22%;
+  --end: 38%;
+}
+
+.hero-story__gradient-blur > span:nth-child(2) {
+  --blur: 0.5px;
+  --start: 12%;
+  --solid-start: 26%;
+  --solid-end: 36%;
+  --end: 52%;
+}
+
+.hero-story__gradient-blur > span:nth-child(3) {
+  --blur: 1px;
+  --start: 26%;
+  --solid-start: 40%;
+  --solid-end: 50%;
+  --end: 66%;
+}
+
+.hero-story__gradient-blur > span:nth-child(4) {
+  --blur: 2px;
+  --start: 40%;
+  --solid-start: 54%;
+  --solid-end: 64%;
+  --end: 80%;
+}
+
+.hero-story__gradient-blur > span:nth-child(5) {
+  --blur: 4px;
+  --start: 54%;
+  --solid-start: 68%;
+  --solid-end: 78%;
+  --end: 92%;
+}
+
+.hero-story__gradient-blur > span:nth-child(6) {
+  --blur: 6px;
+  --start: 68%;
+  --solid-start: 80%;
+  --solid-end: 88%;
+  --end: 100%;
+}
+
+.hero-story__gradient-blur > span:nth-child(7) {
+  --blur: 10px;
+  --start: 82%;
+  --solid-start: 94%;
+  --solid-end: 100%;
+  --end: 100%;
 }
 
 .hero-story__shade {
@@ -193,6 +268,10 @@ h1 {
   align-self: stretch;
 }
 
+.hero-story__text--with-timer {
+  gap: 8px;
+}
+
 .hero-story__title,
 .hero-story__subline {
   margin: 0;
@@ -212,6 +291,102 @@ h1 {
   font-size: var(--text-l-size);
   line-height: var(--text-l-line);
   font-weight: var(--text-l-weight-400);
+}
+
+.hero-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  align-self: stretch;
+}
+
+.hero-countdown__label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-line);
+  font-weight: var(--text-m-weight-400);
+}
+
+.hero-countdown__slots {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.hero-countdown__slot {
+  display: flex;
+  width: 48px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.hero-countdown__number {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-background-primary);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 500;
+}
+
+.hero-countdown__digit-slot {
+  position: relative;
+  width: 15px;
+  height: 32px;
+  overflow: hidden;
+}
+
+.hero-countdown__digit {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-countdown__digit--old {
+  animation: heroCountdownDigitOut 300ms ease-in-out forwards;
+}
+
+.hero-countdown__digit--new {
+  transform: translateY(-70%);
+  opacity: 0;
+  animation: heroCountdownDigitIn 300ms ease-in-out forwards;
+}
+
+.hero-countdown__unit {
+  width: 100%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--text-s-weight-500);
+  text-align: center;
+}
+
+.hero-countdown__separator {
+  color: var(--color-background-primary);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 500;
+}
+
+@keyframes heroCountdownDigitOut {
+  to {
+    transform: translateY(70%);
+    opacity: 0;
+  }
+}
+
+@keyframes heroCountdownDigitIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .hero-story__actions {
@@ -277,7 +452,7 @@ h1 {
 }
 
 .hero-story--active .hero-story__indicator--active .hero-story__indicator-fill {
-  animation: heroStoryProgress 5s linear forwards;
+  animation: heroStoryProgress 10s linear forwards;
 }
 
 @keyframes heroStoryProgress {

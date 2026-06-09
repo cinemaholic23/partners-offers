@@ -91,6 +91,18 @@ const heroStoriesData = [
     ],
     title: "Привилегии в\u00a0ресторанах",
     cta: "Смотреть на\u00a0карте"
+  },
+  {
+    image: "assets/images/ga-hero.png",
+    logos: [
+      { image: "assets/images/ga-logo.png", label: "Межгалактический кэшбэк" }
+    ],
+    title: "Межгалактический кэшбэк 40%",
+    timer: {
+      label: "до конца акции",
+      remainingSeconds: 7210
+    },
+    cta: "За\u00a0покупками"
   }
 ];
 
@@ -400,9 +412,113 @@ function createHeroIndicators(activeIndex) {
   return indicators;
 }
 
+function getHeroCountdownLabel(unit, value) {
+  const forms = {
+    hours: ["час", "часа", "часов"],
+    minutes: ["минута", "минуты", "минут"],
+    seconds: ["секунда", "секунды", "секунд"]
+  };
+  const absoluteValue = Math.abs(value);
+  const lastTwoDigits = absoluteValue % 100;
+  const lastDigit = absoluteValue % 10;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+    return forms[unit][2];
+  }
+
+  if (lastDigit === 1) {
+    return forms[unit][0];
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4) {
+    return forms[unit][1];
+  }
+
+  return forms[unit][2];
+}
+
+function getHeroCountdownValues(totalSeconds) {
+  return getTimerSegments(totalSeconds).map((segment) => ({
+    ...segment,
+    number: Number(segment.value),
+    label: getHeroCountdownLabel(segment.unit, Number(segment.value))
+  }));
+}
+
+function createHeroCountdownSlot(segment, previousValue) {
+  const slot = createElement("span", "hero-countdown__slot");
+  const number = createElement("span", "hero-countdown__number");
+
+  slot.dataset.unit = segment.unit;
+  slot.dataset.value = segment.value;
+
+  segment.value.split("").forEach((digit, index) => {
+    const previousDigit = previousValue ? previousValue[index] : null;
+    const digitSlot = createElement("span", "hero-countdown__digit-slot");
+
+    if (previousDigit && previousDigit !== digit) {
+      digitSlot.append(createElement("span", "hero-countdown__digit hero-countdown__digit--old", previousDigit));
+      digitSlot.append(createElement("span", "hero-countdown__digit hero-countdown__digit--new", digit));
+    } else {
+      digitSlot.append(createElement("span", "hero-countdown__digit", digit));
+    }
+
+    number.append(digitSlot);
+  });
+
+  slot.append(number);
+  slot.append(createElement("span", "hero-countdown__unit", segment.label));
+  return slot;
+}
+
+function renderHeroCountdown(countdown, totalSeconds, previousValues = {}) {
+  const slots = countdown.querySelector(".hero-countdown__slots");
+
+  slots.innerHTML = "";
+
+  getHeroCountdownValues(totalSeconds).forEach((segment, index) => {
+    if (index > 0) {
+      slots.append(createElement("span", "hero-countdown__separator", ":"));
+    }
+
+    slots.append(createHeroCountdownSlot(segment, previousValues[segment.unit]));
+  });
+}
+
+function createHeroCountdown(timer) {
+  const countdown = createElement("div", "hero-countdown");
+
+  countdown.dataset.endsAt = String(Date.now() + timer.remainingSeconds * 1000);
+  countdown.dataset.remainingSeconds = String(timer.remainingSeconds);
+  countdown.append(createElement("div", "hero-countdown__label", timer.label));
+  countdown.append(createElement("div", "hero-countdown__slots"));
+  renderHeroCountdown(countdown, timer.remainingSeconds);
+  return countdown;
+}
+
+function syncHeroCountdowns() {
+  document.querySelectorAll(".hero-countdown").forEach((countdown) => {
+    const remainingSeconds = getTimerRemainingSeconds(Number(countdown.dataset.endsAt));
+    const currentSeconds = Number(countdown.dataset.remainingSeconds);
+
+    if (remainingSeconds === currentSeconds) {
+      return;
+    }
+
+    const previousValues = [...countdown.querySelectorAll(".hero-countdown__slot")].reduce((values, slot) => {
+      values[slot.dataset.unit] = slot.dataset.value;
+      return values;
+    }, {});
+
+    countdown.dataset.remainingSeconds = String(remainingSeconds);
+    renderHeroCountdown(countdown, remainingSeconds, previousValues);
+  });
+}
+
 function createHeroStory(story, index) {
   const article = createElement("article", `hero-story${index === 0 ? " hero-story--active" : ""}`);
   const image = createElement("img", "hero-story__image");
+  const gradientBlur = createElement("div", "hero-story__gradient-blur");
   const logos = createElement("div", "partner-logos hero-story__logos");
   const bottom = createElement("div", "hero-story__bottom");
   const content = createElement("div", "hero-story__content");
@@ -413,6 +529,10 @@ function createHeroStory(story, index) {
   image.src = story.image;
   image.alt = "";
   cta.type = "button";
+
+  for (let layer = 0; layer < 7; layer += 1) {
+    gradientBlur.append(createElement("span", ""));
+  }
 
   story.logos.forEach((logo) => {
     const className = `partner-logo${logo.kind === "more" ? " partner-logo--more" : ""}`;
@@ -432,6 +552,11 @@ function createHeroStory(story, index) {
     text.append(createElement("p", "hero-story__subline", story.subline));
   }
 
+  if (story.timer) {
+    text.classList.add("hero-story__text--with-timer");
+    text.append(createHeroCountdown(story.timer));
+  }
+
   actions.append(cta);
   actions.append(createHeroIndicators(index));
   content.append(text);
@@ -439,7 +564,7 @@ function createHeroStory(story, index) {
 
   article.append(image);
   article.append(logos);
-  bottom.append(createElement("div", "hero-story__blur"));
+  bottom.append(gradientBlur);
   bottom.append(createElement("div", "hero-story__shade"));
   bottom.append(content);
   article.append(bottom);
@@ -447,7 +572,7 @@ function createHeroStory(story, index) {
 }
 
 function initHeroStories(root) {
-  const duration = 5000;
+  const duration = 10000;
   const track = createElement("div", "hero-stories__track");
   let activeIndex = 0;
   let autoplayTimer;
@@ -541,6 +666,8 @@ if (offerFooterTimer) {
 }
 
 startFomoTimers();
+syncHeroCountdowns();
+window.setInterval(syncHeroCountdowns, 1000);
 
 function getCarouselSnapPoints() {
   const cards = [...offersCarousel.querySelectorAll(".partner-card")];
