@@ -117,9 +117,13 @@ h1 {
 
 .hero-stories__track {
   display: flex;
+  gap: 0;
   width: 100%;
   height: 100%;
   transition: transform 300ms ease-in-out;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-story {
@@ -127,13 +131,17 @@ h1 {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
+  margin: 0;
   overflow: hidden;
   color: var(--color-background-primary);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-story__image {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -152,6 +160,8 @@ h1 {
   bottom: 0;
   left: 0;
   z-index: 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-story__gradient-blur,
@@ -159,6 +169,8 @@ h1 {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-story__gradient-blur {
@@ -169,9 +181,7 @@ h1 {
 .hero-story__gradient-blur > span {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.01);
-  -webkit-backdrop-filter: blur(var(--blur));
-  backdrop-filter: blur(var(--blur));
+  overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent var(--start),
@@ -186,6 +196,19 @@ h1 {
     black var(--solid-end),
     transparent var(--end)
   );
+}
+
+.hero-story__gradient-blur img {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
+  aspect-ratio: 1;
+  object-fit: cover;
+  filter: blur(var(--blur));
+  transform: scale(1.06);
+  transform-origin: center;
 }
 
 .hero-story__gradient-blur > span:nth-child(1) {
@@ -253,6 +276,7 @@ h1 {
   position: relative;
   z-index: 2;
   display: flex;
+  width: 100%;
   padding: 8px 20px 44px;
   flex-direction: column;
   justify-content: flex-end;

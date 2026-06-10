@@ -516,7 +516,7 @@ function syncHeroCountdowns() {
 }
 
 function createHeroStory(story, index) {
-  const article = createElement("article", `hero-story${index === 0 ? " hero-story--active" : ""}`);
+  const article = createElement("article", "hero-story");
   const image = createElement("img", "hero-story__image");
   const gradientBlur = createElement("div", "hero-story__gradient-blur");
   const logos = createElement("div", "partner-logos hero-story__logos");
@@ -531,7 +531,13 @@ function createHeroStory(story, index) {
   cta.type = "button";
 
   for (let layer = 0; layer < 7; layer += 1) {
-    gradientBlur.append(createElement("span", ""));
+    const blurLayer = createElement("span", "");
+    const blurImage = createElement("img", "");
+
+    blurImage.src = story.image;
+    blurImage.alt = "";
+    blurLayer.append(blurImage);
+    gradientBlur.append(blurLayer);
   }
 
   story.logos.forEach((logo) => {
@@ -573,67 +579,192 @@ function createHeroStory(story, index) {
 
 function initHeroStories(root) {
   const duration = 10000;
+  const transitionDuration = 300;
+  const storyCount = heroStoriesData.length;
   const track = createElement("div", "hero-stories__track");
-  let activeIndex = 0;
+  let trackPosition = 1;
   let autoplayTimer;
+  let transitionTimer;
+  let pointerActive = false;
+  let dragAxis = null;
   let pointerStartX = 0;
   let pointerStartY = 0;
+  let pointerStartTime = 0;
+  let dragOffset = 0;
+  let isAnimating = false;
+
+  if (!storyCount) {
+    return;
+  }
+
+  track.append(createHeroStory(heroStoriesData[storyCount - 1], storyCount - 1));
 
   heroStoriesData.forEach((story, index) => {
     track.append(createHeroStory(story, index));
   });
 
+  track.append(createHeroStory(heroStoriesData[0], 0));
   root.append(track);
 
+  function getSlideWidth() {
+    return root.clientWidth;
+  }
+
+  function setTrackTransform(offset = 0, animate = true) {
+    const translateX = (-trackPosition * getSlideWidth()) + offset;
+
+    track.style.transition = animate ? `transform ${transitionDuration}ms ease-in-out` : "none";
+    track.style.transform = `translate3d(${translateX}px, 0, 0)`;
+  }
+
   function restartActiveProgress() {
-    const activeStory = track.children[activeIndex];
+    const activeStory = track.children[trackPosition];
 
     activeStory.classList.remove("hero-story--active");
     void activeStory.offsetWidth;
     activeStory.classList.add("hero-story--active");
   }
 
+  function updateActiveStory(restartProgress = true) {
+    [...track.children].forEach((story, index) => {
+      story.classList.toggle("hero-story--active", index === trackPosition);
+    });
+
+    if (restartProgress) {
+      restartActiveProgress();
+    }
+  }
+
   function scheduleNext() {
     window.clearTimeout(autoplayTimer);
     autoplayTimer = window.setTimeout(() => {
-      showStory(activeIndex + 1);
+      showTrackPosition(trackPosition + 1);
     }, duration);
   }
 
-  function showStory(nextIndex) {
-    const storyCount = heroStoriesData.length;
-    activeIndex = (nextIndex + storyCount) % storyCount;
-    track.style.transform = `translateX(-${activeIndex * 100}%)`;
-
-    [...track.children].forEach((story, index) => {
-      story.classList.toggle("hero-story--active", index === activeIndex);
-    });
-
-    restartActiveProgress();
+  function showTrackPosition(nextPosition) {
+    trackPosition = nextPosition;
+    isAnimating = true;
+    setTrackTransform(0, true);
+    updateActiveStory();
+    window.clearTimeout(transitionTimer);
+    transitionTimer = window.setTimeout(completeTrackTransition, transitionDuration + 50);
     scheduleNext();
   }
 
-  root.addEventListener("pointerdown", (event) => {
-    window.clearTimeout(autoplayTimer);
-    pointerStartX = event.clientX;
-    pointerStartY = event.clientY;
-    root.setPointerCapture(event.pointerId);
-  });
-
-  root.addEventListener("pointerup", (event) => {
-    const deltaX = event.clientX - pointerStartX;
-    const deltaY = event.clientY - pointerStartY;
-
-    if (Math.abs(deltaX) < 32 || Math.abs(deltaX) < Math.abs(deltaY)) {
-      scheduleNext();
+  function finishLoopJump() {
+    if (trackPosition === 0) {
+      trackPosition = storyCount;
+    } else if (trackPosition === storyCount + 1) {
+      trackPosition = 1;
+    } else {
       return;
     }
 
-    showStory(activeIndex + (deltaX < 0 ? 1 : -1));
+    setTrackTransform(0, false);
+    updateActiveStory();
+    scheduleNext();
+  }
+
+  function completeTrackTransition() {
+    if (!isAnimating) {
+      return;
+    }
+
+    isAnimating = false;
+    window.clearTimeout(transitionTimer);
+    finishLoopJump();
+  }
+
+  track.addEventListener("transitionend", (event) => {
+    if (event.target !== track || event.propertyName !== "transform") {
+      return;
+    }
+
+    completeTrackTransition();
   });
 
-  root.addEventListener("pointercancel", scheduleNext);
+  root.addEventListener("pointerdown", (event) => {
+    window.clearTimeout(autoplayTimer);
+    window.clearTimeout(transitionTimer);
+    isAnimating = false;
+    setTrackTransform(0, false);
+    pointerActive = true;
+    dragAxis = null;
+    dragOffset = 0;
+    pointerStartX = event.clientX;
+    pointerStartY = event.clientY;
+    pointerStartTime = performance.now();
+    track.style.transition = "none";
+    root.setPointerCapture(event.pointerId);
+  });
 
+  root.addEventListener("pointermove", (event) => {
+    if (!pointerActive) {
+      return;
+    }
+
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+
+    if (!dragAxis && Math.max(Math.abs(deltaX), Math.abs(deltaY)) >= 6) {
+      dragAxis = Math.abs(deltaX) > Math.abs(deltaY) ? "horizontal" : "vertical";
+    }
+
+    if (dragAxis !== "horizontal") {
+      return;
+    }
+
+    event.preventDefault();
+    dragOffset = Math.max(-getSlideWidth(), Math.min(getSlideWidth(), deltaX));
+    setTrackTransform(dragOffset, false);
+  });
+
+  root.addEventListener("pointerup", (event) => {
+    if (!pointerActive) {
+      return;
+    }
+
+    pointerActive = false;
+    try {
+      root.releasePointerCapture?.(event.pointerId);
+    } catch {
+      // Pointer capture may already be released by the browser.
+    }
+    const deltaX = event.clientX - pointerStartX;
+    const deltaY = event.clientY - pointerStartY;
+    const elapsed = Math.max(performance.now() - pointerStartTime, 1);
+    const velocity = Math.abs(deltaX) / elapsed;
+    const shouldSwitch = dragAxis === "horizontal"
+      && Math.abs(deltaX) > Math.abs(deltaY)
+      && (
+        Math.abs(deltaX) >= getSlideWidth() * 0.18
+        || (Math.abs(deltaX) >= 24 && velocity >= 0.45)
+      );
+
+    if (!shouldSwitch) {
+      showTrackPosition(trackPosition);
+      return;
+    }
+
+    showTrackPosition(trackPosition + (deltaX < 0 ? 1 : -1));
+  });
+
+  root.addEventListener("pointercancel", () => {
+    if (!pointerActive) {
+      return;
+    }
+
+    pointerActive = false;
+    showTrackPosition(trackPosition);
+  });
+
+  window.addEventListener("resize", () => {
+    setTrackTransform(0, false);
+  });
+
+  setTrackTransform(0, false);
+  updateActiveStory();
   scheduleNext();
 }
 
